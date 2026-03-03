@@ -5,6 +5,13 @@ import logging
 from typing import List, Dict, Any
 from scapy.all import rdpcap, IP, TCP, UDP, ICMP
 import magic
+try:
+    # Test if libmagic is available
+    magic.from_buffer(b"")
+    HAS_LIBMAGIC = True
+except Exception:
+    HAS_LIBMAGIC = False
+    import puremagic
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +30,26 @@ class UniversalIngestionService:
         """
         Detect file type and parse accordingly.
         """
-        mime = magic.from_buffer(content, mime=True)
-        logger.info(f"Processing {filename} (MIME: {mime})")
+        mime = "application/octet-stream"
+        try:
+            if HAS_LIBMAGIC:
+                mime = magic.from_buffer(content, mime=True)
+            else:
+                ext_guesses = puremagic.from_string(content, mime=True)
+                if ext_guesses:
+                    mime = ext_guesses
+        except Exception as e:
+            logger.warning(f"MIME detection failed: {e}. Falling back to filename extension.")
 
-        if filename.endswith('.pcap') or 'pcap' in mime:
+        logger.info(f"Processing {filename} (Detected MIME: {mime})")
+
+        # Fallback to extension if MIME is generic
+        is_pcap = filename.endswith('.pcap') or 'pcap' in mime
+        is_csv_or_log = filename.endswith('.csv') or 'csv' in mime or 'text/plain' in mime
+
+        if is_pcap:
             return self._parse_pcap(content)
-        elif filename.endswith('.csv') or 'csv' in mime or 'text/plain' in mime:
+        elif is_csv_or_log:
             # Check if it's a log or CSV
             decoded = content.decode('utf-8', errors='ignore')
             if ',' in decoded.split('\n')[0]:

@@ -12,4 +12,5 @@ python-jose[cryptography]
 passlib[bcrypt]
 pymongo
 networkx
-python-magic-bin
+python-magic
+puremagic

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_V1_URL } from '../config/api';
 
 interface ThreatLocation {
     id: string;
@@ -15,7 +16,7 @@ const ThreatMap: React.FC = () => {
     useEffect(() => {
         const fetchThreats = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/v1/threats/map');
+                const response = await fetch(`${API_V1_URL}/threats/map`);
                 const data: ThreatLocation[] = await response.json();
 
                 // Map lat/lng to percentages (Simplified projection)

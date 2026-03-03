@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     HEURISTIC_FALLBACK: bool = True
     
     # Security
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = ["*"]  # In production, this can be narrow but "*" ensures initial connection
     
     class Config:
         case_sensitive = True

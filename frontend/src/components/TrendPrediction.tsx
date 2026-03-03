@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { API_V1_URL } from '../config/api';
 
 interface Prediction {
     status: string;
@@ -14,7 +15,7 @@ const TrendPrediction: React.FC = () => {
     useEffect(() => {
         const fetchPrediction = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/v1/threats/predict');
+                const response = await fetch(`${API_V1_URL}/threats/predict`);
                 const data = await response.json();
                 setPrediction(data);
             } catch (error) {

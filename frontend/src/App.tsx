@@ -8,6 +8,7 @@ import ForensicsView from './components/Forensics/ForensicsView';
 import TrendPrediction from './components/TrendPrediction';
 import IPSView from './components/IPSView';
 import { ShieldAlert, Activity, Zap, Globe } from 'lucide-react';
+import { API_V1_URL } from './config/api';
 
 interface Stats {
   total_alerts: number;
@@ -26,7 +27,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/dashboard/stats');
+        const response = await fetch(`${API_V1_URL}/dashboard/stats`);
         if (!response.ok) throw new Error('API error');
         const data = await response.json();
         setStats(data);
@@ -50,7 +51,7 @@ const App: React.FC = () => {
 
     const fetchAlerts = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/alerts/alerts?limit=5');
+        const response = await fetch(`${API_V1_URL}/alerts/alerts?limit=5`);
         if (!response.ok) throw new Error('API error');
         const data = await response.json();
         setAlerts(data);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldX, Unlock, Server, ShieldCheck } from 'lucide-react';
+import { API_V1_URL } from '../config/api';
 
 interface BlockedIP {
     ip_address: string;
@@ -13,7 +14,7 @@ const IPSView: React.FC = () => {
 
     const fetchBlocked = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/v1/ips/blocked');
+            const response = await fetch(`${API_V1_URL}/ips/blocked`);
             const data = await response.json();
             setBlockedList(data);
         } catch (error) {
@@ -23,7 +24,7 @@ const IPSView: React.FC = () => {
 
     const unblockIp = async (ip: string) => {
         try {
-            await fetch(`http://localhost:8000/api/v1/ips/unblock/${ip}`, { method: 'POST' });
+            await fetch(`${API_V1_URL}/ips/unblock/${ip}`, { method: 'POST' });
             fetchBlocked();
         } catch (error) {
             console.error("Failed to unblock IP:", error);

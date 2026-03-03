@@ -10,15 +10,49 @@ const AttackChart: React.FC<AttackChartProps> = ({ data }) => {
         chart: {
             type: 'donut',
             background: 'transparent',
-            foreColor: 'var(--text-secondary)',
+            foreColor: '#94a3b8',
+            animations: {
+                enabled: true,
+                speed: 800,
+                animateGradually: {
+                    enabled: true,
+                    delay: 150
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 350
+                }
+            },
+            dropShadow: {
+                enabled: true,
+                blur: 10,
+                opacity: 0.2
+            }
         },
         labels: data.map(d => d.name),
-        colors: ['#ff4d4d', '#ffb84d', '#7000ff', '#00f2ff', '#4dff88'],
+        colors: [
+            '#00f2ff', // Cyan
+            '#7000ff', // Purple
+            '#ff4d4d', // Red
+            '#f97316', // Orange
+            '#22c55e'  // Green
+        ],
         stroke: {
-            show: false,
+            show: true,
+            width: 2,
+            colors: ['rgba(15, 23, 42, 0.8)']
         },
         legend: {
             position: 'bottom',
+            fontFamily: 'inherit',
+            fontWeight: 700,
+            labels: {
+                colors: '#94a3b8'
+            },
+            itemMargin: {
+                horizontal: 10,
+                vertical: 5
+            }
         },
         dataLabels: {
             enabled: false,
@@ -26,24 +60,33 @@ const AttackChart: React.FC<AttackChartProps> = ({ data }) => {
         plotOptions: {
             pie: {
                 donut: {
-                    size: '75%',
+                    size: '80%',
                     labels: {
                         show: true,
                         name: {
                             show: true,
-                            fontSize: '14px',
-                            fontWeight: 600,
+                            fontSize: '11px',
+                            fontWeight: 900,
+                            color: '#64748b',
+                            offsetY: -10
                         },
                         value: {
                             show: true,
-                            fontSize: '20px',
-                            fontWeight: 700,
-                            color: 'var(--text-primary)',
+                            fontSize: '24px',
+                            fontWeight: 900,
+                            color: '#ffffff',
+                            offsetY: 10,
+                            formatter: (val) => String(val)
                         },
                         total: {
                             show: true,
-                            label: 'Total',
-                            color: 'var(--text-secondary)',
+                            label: 'TOTAL EVENTS',
+                            color: '#64748b',
+                            fontSize: '9px',
+                            fontWeight: 900,
+                            formatter: (w) => {
+                                return String(w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0))
+                            }
                         }
                     }
                 }
@@ -51,14 +94,21 @@ const AttackChart: React.FC<AttackChartProps> = ({ data }) => {
         },
         tooltip: {
             theme: 'dark',
+            style: {
+                fontSize: '12px',
+                fontFamily: 'inherit'
+            },
+            y: {
+                formatter: (val) => `${val} detections`
+            }
         }
     };
 
     const series = data.map(d => d.value);
 
     return (
-        <div className="w-full h-full">
-            <Chart options={options} series={series} type="donut" width="100%" height="100%" />
+        <div className="w-full h-full flex items-center justify-center fade-in-up">
+            <Chart options={options} series={series} type="donut" width="100%" height="320" />
         </div>
     );
 };

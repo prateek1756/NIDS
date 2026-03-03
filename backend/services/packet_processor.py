@@ -37,19 +37,32 @@ class PacketProcessor:
             return features # Return default mock features
 
         try:
-            # Placeholder for actual Scapy-based extraction logic
-            # This would normally transform a packet into the 41 features of NSL-KDD
             if isinstance(packet_data, IP):
                 features["src_bytes"] = len(packet_data.payload)
+                features["ttl"] = packet_data.ttl
+                features["flags"] = str(packet_data.flags)
+                features["length"] = len(packet_data)
+                
                 if TCP in packet_data:
                     features["protocol_type"] = "tcp"
+                    features["tcp_flags"] = packet_data[TCP].flags
+                    features["service"] = self._map_port_to_service(packet_data[TCP].dport)
                 elif UDP in packet_data:
                     features["protocol_type"] = "udp"
+                    features["service"] = self._map_port_to_service(packet_data[UDP].dport)
                 elif ICMP in packet_data:
                     features["protocol_type"] = "icmp"
         except Exception as e:
             logger.error(f"Feature extraction failed: {e}")
             
         return features
+
+    def _map_port_to_service(self, port: int) -> str:
+        """Map common ports to service names"""
+        services = {
+            80: "http", 443: "https", 22: "ssh", 21: "ftp", 
+            25: "smtp", 53: "dns", 3306: "mysql", 5432: "postgresql"
+        }
+        return services.get(port, "other")
 
 packet_processor = PacketProcessor()

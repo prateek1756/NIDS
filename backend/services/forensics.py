@@ -6,6 +6,7 @@ import logging
 import uuid
 import asyncio
 from backend.services.ips_service import ips_service
+from backend.services.settings_service import settings_service
 
 logger = logging.getLogger(__name__)
 
@@ -134,8 +135,10 @@ class ForensicsEngine:
                 "recommendation": "HIDE these devices from the network for a few minutes to let the noise settle."
             })
             # Automatic Blocking
-            for node in mobs:
-                asyncio.create_task(ips_service.block_ip(node, "Automatic blocking: Detection of Coordinated Mob (DoS)", "DoS"))
+            auto_block = await settings_service.get_setting("auto_block", True)
+            if auto_block:
+                for node in mobs:
+                    asyncio.create_task(ips_service.block_ip(node, "Automatic blocking: Detection of Coordinated Mob (DoS)", "DoS"))
 
         if prowlers:
             alerts.append({
@@ -156,22 +159,37 @@ class ForensicsEngine:
         nodes = []
         for node in self.graph.nodes():
             is_suspicious = node in suspicious_nodes
+            in_deg = self.graph.in_degree(node)
+            out_deg = self.graph.out_degree(node)
+            total_deg = in_deg + out_deg
+            
+            # Simple Internal/External classification
+            is_internal = any(node.startswith(prefix) for prefix in ["192.168.", "10.", "172.", "127."])
+            
+            group = "external"
+            if is_suspicious: group = "suspicious"
+            elif total_deg > 15: group = "hub"
+            elif is_internal: group = "internal"
+
             nodes.append({
                 "id": node,
                 "label": node,
-                "color": "var(--danger)" if is_suspicious else "var(--accent-primary)",
-                "size": 25 if is_suspicious else 15,
-                "title": f"IP: {node}\nIn: {self.graph.in_degree(node)}\nOut: {self.graph.out_degree(node)}"
+                "group": group,
+                "value": total_deg, # Vis-network uses 'value' for relative sizing
+                "title": f"<b>IP: {node}</b><br/>Type: {group.upper()}<br/>Inbound: {in_deg}<br/>Outbound: {out_deg}"
             })
 
         edges = []
         for u, v, data in self.graph.edges(data=True):
+            count = data.get('count', 1)
             edges.append({
                 "from": u,
                 "to": v,
-                "label": str(data['count']),
+                "label": str(count) if count > 1 else "",
                 "arrows": "to",
-                "color": "rgba(255, 255, 255, 0.2)"
+                "width": min(count, 5), # Visually represent traffic volume
+                "color": {"opacity": 0.4},
+                "title": f"Traffic: {count} packets"
             })
 
         # Generate Human-Readable Summary

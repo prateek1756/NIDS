@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 from backend.core.config import settings
-from backend.api import detection, dashboard, threats, ingestion, ips
+from backend.api import detection, dashboard, threats, ingestion, ips, settings as api_settings
 from backend.services.database import db_service
 
 from contextlib import asynccontextmanager
@@ -45,6 +45,7 @@ app.include_router(dashboard.router, prefix=settings.API_V1_STR + "/dashboard", 
 app.include_router(threats.router, prefix=settings.API_V1_STR + "/threats", tags=["threats"])
 app.include_router(ingestion.router, prefix=settings.API_V1_STR + "/ingestion", tags=["Ingestion"])
 app.include_router(ips.router, prefix=settings.API_V1_STR + "/ips", tags=["ips"])
+app.include_router(api_settings.router, prefix=settings.API_V1_STR + "/settings", tags=["settings"])
 
 @app.get("/")
 async def root():

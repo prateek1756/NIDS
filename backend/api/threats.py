@@ -19,30 +19,58 @@ async def get_threat_map():
     """
     Get coordinates and info for current threats based on real detected alerts.
     """
-    alerts = await db_service.get_alerts(limit=5)
+    alerts = await db_service.get_alerts(limit=15)
     
-    # Mocking geographic mapping for detected IPs
-    # In production, this would use a GeoIP library
+    # Predefined interesting global coordinates for better visualization if random seed is low
+    GLOBAL_HUBS = [
+        {"lat": 37.7749, "lng": -122.4194, "city": "San Francisco"},
+        {"lat": 51.5074, "lng": -0.1278, "city": "London"},
+        {"lat": 35.6762, "lng": 139.6503, "city": "Tokyo"},
+        {"lat": -33.8688, "lng": 151.2093, "city": "Sydney"},
+        {"lat": 1.3521, "lng": 103.8198, "city": "Singapore"},
+        {"lat": 55.7558, "lng": 37.6173, "city": "Moscow"},
+        {"lat": -23.5505, "lng": -46.6333, "city": "São Paulo"},
+        {"lat": 28.6139, "lng": 77.2090, "city": "New Delhi"},
+        {"lat": 30.0444, "lng": 31.2357, "city": "Cairo"},
+        {"lat": 39.9042, "lng": 116.4074, "city": "Beijing"}
+    ]
+
     threat_locations = []
+    
+    # Use real alerts if available
     for i, alert in enumerate(alerts):
-        # Deterministic but pseudo-random coordinates based on IP
-        ip_parts = alert.get("features", {}).get("source_ip", "0.0.0.0").split(".")
-        seed = int(ip_parts[-1]) if len(ip_parts) > 0 else 0
+        ip = alert.get("features", {}).get("source_ip", "0.0.0.0")
+        ip_parts = ip.split(".")
+        seed = sum(int(p) for p in ip_parts) if len(ip_parts) == 4 else random.randint(0, 100)
+        
+        # Mix in some randomness with deterministic seed
+        hub = GLOBAL_HUBS[seed % len(GLOBAL_HUBS)]
+        lat_offset = (seed % 10) - 5
+        lng_offset = ((seed * 7) % 10) - 5
         
         threat_locations.append({
-            "id": alert.get("id"),
-            "lat": 20 + (seed % 40) - 20, # Range around equator/tropics
-            "lng": 10 + (seed % 100) - 50,
-            "city": f"Source {alert.get('features', {}).get('source_ip')}",
-            "type": alert.get("attack_type", "Unknown"),
-            "severity": "High" if alert.get("is_malicious") else "Low"
+            "id": f"alert-{i}-{seed}",
+            "lat": hub["lat"] + lat_offset,
+            "lng": hub["lng"] + lng_offset,
+            "city": f"{hub['city']} (via {ip})",
+            "type": alert.get("attack_type", "Anomaly"),
+            "severity": "Critical" if alert.get("risk_score", 0) > 0.8 else "High" if alert.get("is_malicious") else "Medium"
         })
     
-    # Fallback if no real alerts found
-    if not threat_locations:
-        return [
-            {"id": 1, "lat": 34.0522, "lng": -118.2437, "city": "Los Angeles", "type": "DoS", "severity": "High"},
-            {"id": 5, "lat": 40.7128, "lng": -74.0060, "city": "New York", "type": "DoS", "severity": "Critical"}
-        ]
+    # Fallback/Supplemental mock data for a busy map
+    if len(threat_locations) < 8:
+        for i in range(8 - len(threat_locations)):
+            hub = random.choice(GLOBAL_HUBS)
+            attack_types = ["DoS", "Probe", "R2L", "U2R", "Brute Force"]
+            severities = ["Low", "Medium", "High", "Critical"]
+            
+            threat_locations.append({
+                "id": f"mock-{i}",
+                "lat": hub["lat"] + random.uniform(-10, 10),
+                "lng": hub["lng"] + random.uniform(-10, 10),
+                "city": hub["city"],
+                "type": random.choice(attack_types),
+                "severity": random.choice(severities)
+            })
         
     return threat_locations

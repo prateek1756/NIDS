@@ -83,20 +83,37 @@ class MLEngine:
 
     def heuristic_predict(self, features: dict) -> dict:
         """
-        Simple heuristic logic for detection when ML is unavailable or fails.
+        Refined heuristic logic using enhanced features.
         """
-        # Example heuristics based on common feature names
         score = 0
+        attack_sub_type = "Anomaly"
+
+        # 1. Volume-based (DoS)
         if features.get("dst_bytes", 0) > 1000000: score += 0.4
-        if features.get("count", 0) > 100: score += 0.3
-        if features.get("srv_count", 0) > 100: score += 0.3
-        
-        is_malicious = score > 0.5
+        if features.get("count", 0) > 200: 
+            score += 0.4
+            attack_sub_type = "Potential DoS"
+
+        # 2. Protocol specific (SYN Flood)
+        if features.get("protocol_type") == "tcp" and features.get("tcp_flags") == "S":
+            if features.get("count", 0) > 50:
+                score += 0.5
+                attack_sub_type = "SYN Flood"
+
+        # 3. Spoofing indicators (Low TTL)
+        if features.get("ttl", 255) < 32:
+            score += 0.2 # Suspicious but not definitive alone
+
+        # 4. Unusual Service behavior
+        if features.get("service") == "other" and features.get("dst_bytes", 0) > 50000:
+            score += 0.3
+
+        is_malicious = score >= 0.5
         return {
             "is_malicious": is_malicious,
-            "attack_type": "Heuristic Detection" if is_malicious else "Normal",
-            "confidence": score if is_malicious else 1 - score,
-            "method": "Heuristic"
+            "attack_type": attack_sub_type if is_malicious else "Normal",
+            "confidence": round(min(score, 1.0), 2) if is_malicious else round(1 - score, 2),
+            "method": "Heuristic (Enhanced)"
         }
 
 ml_engine = MLEngine()

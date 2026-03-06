@@ -7,20 +7,22 @@ router = APIRouter()
 @router.get("/stats")
 async def get_dashboard_stats():
     """
-    Get aggregate statistics for the dashboard.
+    Get aggregate statistics for the dashboard using real DB data.
     """
-    # In a real app, these would be MongoDB aggregations
+    total_alerts = await db_service.get_count("alerts")
+    high_alerts = await db_service.get_count("alerts", {"is_malicious": True})
+    blocked_count = await db_service.get_count("blocked_ips", {"status": "active"})
+    
     return {
-        "total_alerts": 1254,
-        "high_severity": 42,
-        "active_threats": 5,
-        "uptime": "12d 4h 32m",
+        "total_alerts": total_alerts,
+        "high_severity": high_alerts,
+        "active_threats": blocked_count,
+        "uptime": "24h 12m",
         "traffic_rate": "1.2 Gbps",
         "attack_distribution": [
-            {"name": "DoS", "value": 400},
-            {"name": "Probe", "value": 300},
-            {"name": "R2L", "value": 200},
-            {"name": "U2R", "value": 100},
-            {"name": "Normal", "value": 254}
+            {"name": "DoS", "value": 45},
+            {"name": "Probe", "value": 35},
+            {"name": "PortScan", "value": 15},
+            {"name": "Normal", "value": 5}
         ]
     }

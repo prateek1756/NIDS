@@ -40,6 +40,11 @@ class DatabaseService:
             return await cursor.to_list(limit)
         return []
 
+    async def get_count(self, collection_name: str, query: dict = None):
+        if self.db is not None:
+            return await self.db[collection_name].count_documents(query or {})
+        return 0
+
     def get_collection(self, name: str):
         if self.db is not None:
             return self.db[name]

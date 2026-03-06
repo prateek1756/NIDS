@@ -19,11 +19,18 @@
   --text-dim: #64748b;
 
   /* Glassmorphism & Effects */
-  --glass-bg: rgba(13, 17, 23, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-glow: rgba(0, 242, 255, 0.1);
-  --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-  --active-glow: 0 0 20px rgba(0, 242, 255, 0.3);
+  --accent-glow: 0 0 20px rgba(0, 242, 255, 0.4);
+  --glass-bg: rgba(10, 12, 16, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-glow: rgba(0, 242, 255, 0.08);
+  --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #fff 0%, var(--accent-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 * {
@@ -38,11 +45,12 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   background-color: var(--bg-dark);
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
   background-image:
-    radial-gradient(circle at 0% 0%, rgba(112, 0, 255, 0.1) 0%, transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
+    radial-gradient(circle at 0% 0%, rgba(112, 0, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(0, 242, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(10, 12, 16, 1) 0%, transparent 100%);
   background-attachment: fixed;
 }
 
@@ -71,13 +79,15 @@ body {
 
 .sidebar {
   width: 280px;
-  background-color: var(--bg-sidebar);
-  border-right: 1px solid var(--glass-border);
+  background-color: rgba(5, 6, 10, 0.75);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   padding: 2.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   z-index: 50;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .main-content {
@@ -225,10 +235,36 @@ body {
   filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.5));
 }
 
+.sidebar-section {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
+}
+
+.sidebar-section-header {
+  font-size: 10px;
+  font-weight: 900;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), transparent);
+}
+
 .active-item {
-  background: linear-gradient(90deg, rgba(0, 242, 255, 0.15) 0%, transparent 100%) !important;
+  background: linear-gradient(90deg, rgba(0, 242, 255, 0.08) 0%, rgba(0, 242, 255, 0.02) 100%) !important;
   color: var(--accent-primary) !important;
-  box-shadow: inset 4px 0 0 var(--accent-primary);
+  border-left: 2px solid var(--accent-primary);
+  border-radius: 0 1.2rem 1.2rem 0 !important;
+  box-shadow: 15px 0 35px rgba(0, 242, 255, 0.03) !important;
 }
 
 .btn-primary {

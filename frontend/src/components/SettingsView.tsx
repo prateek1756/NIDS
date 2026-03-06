@@ -56,11 +56,11 @@ const SettingsView: React.FC = () => {
         <div className="space-y-8 fade-in-up max-w-4xl mx-auto py-8">
             <div className="flex justify-between items-center mb-4">
                 <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
-                        <Settings className="text-accent-primary animate-spin-slow" size={32} />
-                        System Protocols
+                    <h2 className="text-4xl font-black text-white tracking-tighter flex items-center gap-4">
+                        <Settings className="text-accent-primary animate-spin-slow" size={36} />
+                        <span className="text-gradient uppercase">System Protocols Matrix</span>
                     </h2>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mt-1">Configure NIDS Defensive Parameters</p>
+                    <p className="text-slate-500 font-black uppercase tracking-[0.4em] text-[10px] mt-2">Defensive Parameter Configuration Cluster</p>
                 </div>
                 <button
                     onClick={handleSave}
@@ -79,7 +79,7 @@ const SettingsView: React.FC = () => {
                         <div className="p-2 rounded-lg bg-accent-primary/10 text-accent-primary">
                             <Shield size={20} />
                         </div>
-                        <h3 className="text-lg font-black text-white">Core Directive</h3>
+                        <h3 className="text-lg font-black text-white uppercase tracking-widest">Primary Security Directive</h3>
                     </div>
 
                     <div className="space-y-4">
@@ -113,14 +113,14 @@ const SettingsView: React.FC = () => {
                         <div className="p-2 rounded-lg bg-accent-warning/10 text-accent-warning">
                             <Bell size={20} />
                         </div>
-                        <h3 className="text-lg font-black text-white">Alert Matrix</h3>
+                        <h3 className="text-lg font-black text-white uppercase tracking-widest">Digital Alert Matrix</h3>
                     </div>
 
                     <div className="space-y-4">
                         <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 group hover:border-accent-warning/30 transition-all">
                             <div className="space-y-1">
-                                <p className="text-sm font-black text-white">Email Integration</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">External SMTP Reporting</p>
+                                <p className="text-sm font-black text-white">SMTP Secure Relaying</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">External Forensic Dispatch</p>
                             </div>
                             <div
                                 className={`cyber-switch ${settings.email_alerts ? 'checked' : ''}`}
@@ -130,8 +130,8 @@ const SettingsView: React.FC = () => {
 
                         <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 group hover:border-accent-warning/30 transition-all">
                             <div className="space-y-1">
-                                <p className="text-sm font-black text-white">HUD Notifications</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">System-Wide Broadcasts</p>
+                                <p className="text-sm font-black text-white">Interface HUD Broadcasts</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Real-time Visual Intelligence</p>
                             </div>
                             <div
                                 className={`cyber-switch ${settings.desktop_notifications ? 'checked' : ''}`}
@@ -147,7 +147,7 @@ const SettingsView: React.FC = () => {
                         <div className="p-2 rounded-lg bg-accent-success/10 text-accent-success">
                             <Database size={20} />
                         </div>
-                        <h3 className="text-lg font-black text-white">Data Retention & Purge Cycle</h3>
+                        <h3 className="text-lg font-black text-white uppercase tracking-widest">Forensic Lifespan & Sync Cycle</h3>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

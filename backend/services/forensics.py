@@ -32,7 +32,7 @@ class ForensicsEngine:
             create_using=nx.DiGraph()
         )
 
-    def analyze(self) -> Dict[str, Any]:
+    async def analyze(self) -> Dict[str, Any]:
         """Run forensic patterns on the current graph"""
         if not self.data_store:
             return {

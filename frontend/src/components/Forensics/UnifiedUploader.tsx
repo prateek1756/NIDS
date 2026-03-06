@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Activity, AlertTriangle } from 'lucide-react';
+import { API_V1_URL } from '../../config/api';
 
 interface UnifiedUploaderProps {
     onUploadSuccess: (data: any) => void;
@@ -20,12 +21,15 @@ const UnifiedUploader: React.FC<UnifiedUploaderProps> = ({ onUploadSuccess }) =>
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:8000/api/v1/ingestion/upload', {
+            const response = await fetch(`${API_V1_URL}/ingestion/upload`, {
                 method: 'POST',
                 body: formData,
             });
 
-            if (!response.ok) throw new Error('Upload failed');
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Analysis failed. Check file format.');
+            }
 
             const data = await response.json();
             onUploadSuccess(data);
@@ -37,23 +41,25 @@ const UnifiedUploader: React.FC<UnifiedUploaderProps> = ({ onUploadSuccess }) =>
     };
 
     return (
-        <div className="glass-card p-6">
-            <div className="border-2 border-dashed border-slate-700 rounded-xl p-8 hover:border-slate-500 transition-all text-center relative group">
+        <div className="glass-card p-10 bg-slate-900/40 border-white/5 shadow-2xl rounded-[2.5rem] relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+            <div className="border-2 border-dashed border-slate-800 rounded-[2rem] p-12 hover:border-accent-primary/50 transition-all duration-500 text-center relative group/box bg-slate-950/40">
                 <input
                     type="file"
                     onChange={handleFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-accent-primary shadow-lg shadow-accent-primary/20 group-hover:scale-110 transition-transform">
-                        {isUploading ? <Activity className="w-8 h-8 animate-spin" /> : <Upload className="w-8 h-8" />}
+                <div className="flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 rounded-[1.5rem] bg-slate-900/80 flex items-center justify-center text-accent-primary shadow-2xl border border-white/10 group-hover/box:scale-110 group-hover/box:rotate-3 transition-all duration-500">
+                        {isUploading ? <Activity className="w-10 h-10 animate-spin" /> : <Upload className="w-10 h-10" />}
                     </div>
                     <div>
-                        <h4 className="text-xl font-bold text-white mb-2">
-                            {isUploading ? 'Analyzing Bundle...' : 'Select Analysis Package'}
+                        <h4 className="text-2xl font-black text-white mb-2 tracking-tighter uppercase text-gradient">
+                            {isUploading ? 'Parsing intelligence Package...' : 'Inject Secure Data Cluster'}
                         </h4>
-                        <p className="text-slate-400 max-w-xs mx-auto">
-                            Click to browse or drag <span className="text-accent-primary">PCAP</span>, <span className="text-accent-secondary">CSV</span>, or <span className="text-emerald-400">Log</span> files.
+                        <p className="text-slate-500 max-w-sm mx-auto text-xs font-bold uppercase tracking-widest leading-relaxed">
+                            Interrogate <span className="text-accent-primary">PCAP</span>, <span className="text-accent-secondary">CSV</span>, or <span className="text-emerald-500">System Logs</span> through our advanced forensic heuristic engine.
                         </p>
                     </div>
                 </div>

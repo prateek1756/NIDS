@@ -6,8 +6,53 @@ import {
     Lock, Search, Users, RefreshCcw, AlertCircle, Shield
 } from 'lucide-react';
 
-const ForensicsView: React.FC = () => {
+interface ForensicsViewProps {
+    liveData: any[] | null;
+}
+
+const ForensicsView: React.FC<ForensicsViewProps> = ({ liveData }) => {
     const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+    React.useEffect(() => {
+        if (liveData && liveData.length > 0) {
+            // Convert list of packets/alerts into graph format
+            const nodesMap = new Map();
+            const edges: any[] = [];
+
+            liveData.forEach(item => {
+                const f = item.features;
+                if (!f) return;
+
+                if (!nodesMap.has(f.src_ip)) nodesMap.set(f.src_ip, { id: f.src_ip, label: f.src_ip, group: item.type === 'alert' ? 'suspicious' : 'internal' });
+                if (!nodesMap.has(f.dst_ip)) nodesMap.set(f.dst_ip, { id: f.dst_ip, label: f.dst_ip, group: 'external' });
+
+                edges.push({ from: f.src_ip, to: f.dst_ip, label: '1', arrows: 'to' });
+            });
+
+            setAnalysisResult({
+                filename: "LIVE_CAPTURE",
+                events_count: liveData.length,
+                analysis: {
+                    nodes: Array.from(nodesMap.values()),
+                    edges: edges,
+                    forensic_alerts: liveData.filter(i => i.type === 'alert').map(i => ({
+                        id: i.id || Math.random().toString(),
+                        type: i.attack_type,
+                        severity: i.is_malicious ? 'Critical' : 'Low',
+                        description: `Live detection: ${i.attack_type} detected from ${i.features?.src_ip}`,
+                        impact: "Potential real-time breach attempt.",
+                        recommendation: "Check the Live HUD and initiate target focus immediately."
+                    })),
+                    summary: "Streaming real-time network traffic... All anomalies are highlighted in RED.",
+                    stats: {
+                        total_nodes: nodesMap.size,
+                        total_edges: edges.length,
+                        risk_level: liveData.some(i => i.is_malicious) ? 'Critical' : 'Secure'
+                    }
+                }
+            });
+        }
+    }, [liveData]);
 
     const getAlertIcon = (type: string) => {
         const t = (type || '').toLowerCase();

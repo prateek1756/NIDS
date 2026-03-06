@@ -45,37 +45,46 @@ const TrendPrediction: React.FC = () => {
             </div>
 
             <div className="flex-1 flex flex-col justify-center gap-6">
-                <div className="flex items-center gap-4 bg-white/[0.02] p-4 rounded-2xl border border-white/5">
-                    <div className={`p-4 rounded-2xl ${isHighRisk ? 'bg-accent-danger/20 text-accent-danger' : 'bg-accent-success/20 text-accent-success'}`}>
-                        {isHighRisk ? <AlertTriangle size={32} /> : <ShieldCheck size={32} />}
+                <div className="flex items-center gap-6 bg-white/[0.02] p-6 rounded-[2rem] border border-white/5 shadow-inner">
+                    <div className={`p-5 rounded-2xl shadow-lg ${isHighRisk ? 'bg-accent-danger/20 text-accent-danger border border-accent-danger/30' : 'bg-accent-success/20 text-accent-success border border-accent-success/30'}`}>
+                        {isHighRisk ? <AlertTriangle size={36} /> : <ShieldCheck size={36} />}
                     </div>
                     <div>
-                        <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest mb-1">Grid Intelligence</p>
-                        <div className={`text-2xl font-black ${isHighRisk ? 'text-accent-danger' : 'text-accent-success'}`}>
+                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.3em] mb-1">Inference Engine Status</p>
+                        <div className={`text-3xl font-black tracking-tighter ${isHighRisk ? 'text-accent-danger' : 'text-accent-success'}`}>
                             {prediction.status.toUpperCase()}
                         </div>
                     </div>
                 </div>
 
-                <div className="glass-card p-5 bg-accent-primary/[0.03] border-accent-primary/10">
-                    <p className="text-[10px] uppercase font-black text-accent-primary tracking-widest mb-2">Neural Observation</p>
-                    <p className="text-sm font-bold text-white leading-relaxed italic">"{prediction.prediction}"</p>
+                <div className="glass-card p-6 bg-accent-primary/[0.03] border-accent-primary/10 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-100 transition-opacity">
+                        <TrendingUp size={16} className="text-accent-primary" />
+                    </div>
+                    <p className="text-[10px] uppercase font-black text-accent-primary tracking-[0.2em] mb-3">AI Forensic Synthesis</p>
+                    <p className="text-sm font-semibold text-slate-300 leading-relaxed italic">
+                        "{prediction.prediction}"
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
-                        <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Anomaly Factor</p>
-                        <p className="text-xl font-black text-white">{prediction.anomaly_score}</p>
+                <div className="grid grid-cols-2 gap-5">
+                    <div className="bg-slate-900/40 p-5 rounded-[1.5rem] border border-white/5 group hover:border-accent-primary/20 transition-all">
+                        <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Anomaly Coefficient</p>
+                        <p className="text-2xl font-black text-white tracking-tighter">{prediction.anomaly_score}</p>
                     </div>
-                    <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
-                        <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Confidence</p>
-                        <p className="text-xl font-black text-white">{(prediction.confidence * 100).toFixed(0)}%</p>
+                    <div className="bg-slate-900/40 p-5 rounded-[1.5rem] border border-white/5 group hover:border-accent-primary/20 transition-all">
+                        <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Reliability Index</p>
+                        <p className="text-2xl font-black text-white tracking-tighter">{(prediction.confidence * 100).toFixed(0)}%</p>
                     </div>
                 </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
-                * Real-time inference engine processing...
+            <div className="mt-8 pt-5 border-t border-white/5 flex justify-between items-center text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                <span>* Sentinel Inference Active</span>
+                <span className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Sync: 100%
+                </span>
             </div>
         </div>
     );

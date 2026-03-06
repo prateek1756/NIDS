@@ -32,31 +32,31 @@ const RecentEvents: React.FC<RecentEventsProps> = ({ events, alerts }) => {
 
     return (
         <div className="glass-card fade-in-up flex flex-col h-full" style={{ animationDelay: '0.2s', opacity: 0, animationFillMode: 'forwards' }}>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-10">
                 <div>
-                    <h3 className="text-xl font-black text-white flex items-center gap-2">
-                        <Activity className="text-accent-primary" size={20} />
-                        Security Intelligence
+                    <h3 className="text-2xl font-black text-white flex items-center gap-3 tracking-tighter">
+                        <Activity className="text-accent-primary animate-pulse" size={24} />
+                        <span className="text-gradient">Threat Intelligence stream</span>
                     </h3>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Real-time Traffic Forensics</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black mt-1">Real-time Behavioral Forensics</p>
                 </div>
                 <button
                     onClick={handleExport}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all border border-white/10"
+                    className="flex items-center gap-3 px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:border-accent-primary/50 shadow-lg"
                 >
-                    <Download size={14} className="text-accent-primary" />
-                    Export JSON
+                    <Download size={16} className="text-accent-primary" />
+                    Snapshot Export
                 </button>
             </div>
 
             <div className="flex-1 overflow-x-auto custom-scrollbar">
                 <table className="w-full text-left border-separate border-spacing-y-2">
                     <thead>
-                        <tr className="text-[10px] font-black uppercase text-slate-500 tracking-widest">
-                            <th className="pb-2 px-4">Event Type</th>
-                            <th className="pb-2 px-4">Source Origin</th>
-                            <th className="pb-2 px-4">Risk Level</th>
-                            <th className="pb-2 px-4 text-right">Time</th>
+                        <tr className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] border-b border-white/5">
+                            <th className="pb-4 px-4 text-accent-primary/70">Threat Signature</th>
+                            <th className="pb-4 px-4">Attacker Vector</th>
+                            <th className="pb-4 px-4">Heuristic Score</th>
+                            <th className="pb-4 px-4 text-right">Intercepted At</th>
                         </tr>
                     </thead>
                     <tbody>

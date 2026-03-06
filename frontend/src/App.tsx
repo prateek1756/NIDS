@@ -7,10 +7,11 @@ import ThreatMap from './components/ThreatMap';
 import ForensicsView from './components/Forensics/ForensicsView';
 import TrendPrediction from './components/TrendPrediction';
 import IPSView from './components/IPSView';
-import { ShieldAlert, Activity, Zap, Globe } from 'lucide-react';
+import SettingsView from './components/SettingsView';
+import ReportingView from './components/Reporting/ReportingView';
+import { ShieldAlert, Activity, Globe } from 'lucide-react';
 import { API_V1_URL } from './config/api';
 
-import SettingsView from './components/SettingsView';
 import Skeleton from './components/common/Skeleton';
 
 interface Stats {
@@ -26,9 +27,49 @@ const App: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isLive, setIsLive] = useState(false);
+  const [liveTraffic, setLiveTraffic] = useState<any[]>([]);
+
+  const toggleLiveMode = async () => {
+    try {
+      const nextState = !isLive;
+      const response = await fetch(`${API_V1_URL}/detection/toggle-live?enabled=${nextState}`, { method: 'POST' });
+      if (response.ok) {
+        setIsLive(nextState);
+        if (!nextState) setLiveTraffic([]);
+      }
+    } catch (e) {
+      console.error("Failed to toggle live mode", e);
+    }
+  };
+
+  useEffect(() => {
+    let eventSource: EventSource | null = null;
+
+    if (isLive) {
+      eventSource = new EventSource(`${API_V1_URL}/detection/stream`);
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'alert') {
+          setAlerts(prev => [data, ...prev].slice(0, 50));
+        }
+        setLiveTraffic(prev => [...prev, data].slice(-100)); // Keep last 100 packets
+      };
+      eventSource.onerror = (err) => {
+        console.error("SSE connection failed", err);
+        setIsLive(false);
+        eventSource?.close();
+      };
+    }
+
+    return () => {
+      if (eventSource) eventSource.close();
+    };
+  }, [isLive]);
 
   useEffect(() => {
     const fetchStats = async () => {
+      // ... existing fetchStats
       try {
         const response = await fetch(`${API_V1_URL}/dashboard/stats`);
         if (!response.ok) throw new Error('API error');
@@ -99,10 +140,10 @@ const App: React.FC = () => {
                     color="var(--accent-primary)"
                   />
                   <StatsCard
-                    title="Active Threats"
+                    title="Mitigated Threats"
                     value={stats.active_threats}
-                    icon={Zap as any}
-                    color="var(--warning)"
+                    icon={ShieldAlert as any}
+                    color="var(--success)"
                   />
                   <StatsCard
                     title="Uptime"
@@ -122,9 +163,17 @@ const App: React.FC = () => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
-              <div className="glass-card" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ marginBottom: '1.5rem' }}>Attack Distribution</h3>
-                <div style={{ flex: 1 }}>
+              <div className="glass-card flex flex-col h-[450px] bg-gradient-to-br from-white/[0.02] to-transparent p-8">
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">Inbound Risk Matrix</h3>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">Attack Characterization Vector</p>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-accent-primary/5 border border-accent-primary/10">
+                    <Activity size={18} className="text-accent-primary" />
+                  </div>
+                </div>
+                <div className="flex-1">
                   {stats ? <AttackChart data={stats.attack_distribution} /> : <Skeleton height="100%" variant="rect" />}
                 </div>
               </div>
@@ -154,7 +203,7 @@ const App: React.FC = () => {
           </>
         );
       case 'forensics':
-        return <ForensicsView />;
+        return <ForensicsView liveData={isLive ? liveTraffic : null} />;
       case 'ips':
         return <IPSView />;
       case 'alerts':
@@ -169,6 +218,8 @@ const App: React.FC = () => {
             <ThreatMap />
           </div>
         );
+      case 'reporting':
+        return <ReportingView />;
       case 'settings':
         return <SettingsView />;
       default:
@@ -178,42 +229,48 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} isLive={isLive} onToggleLive={toggleLiveMode} />
       <main className="main-content custom-scrollbar">
-        <header className="fade-in-up" style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: '1.5rem', borderBottom: '1px solid var(--glass-border)' }}>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 rounded text-[10px] font-black bg-accent-primary/10 text-accent-primary uppercase tracking-widest border border-accent-primary/20">
-                Secure Environment
+        <header className="fade-in-up flex justify-between items-end border-b border-white/5 pb-8 mb-12">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 rounded-lg text-[9px] font-black bg-accent-primary/10 text-accent-primary uppercase tracking-[0.3em] border border-accent-primary/20 shadow-inner">
+                Neural Defense Grid
+              </span>
+              <span className="px-3 py-1 rounded-lg text-[9px] font-black bg-white/5 text-slate-500 uppercase tracking-[0.3em] border border-white/10">
+                v4.0.2-Stable
               </span>
             </div>
-            <h1 className="neon-text font-black tracking-tighter" style={{ fontSize: '2.5rem', lineHeight: 1 }}>
-              {activeTab === 'dashboard' ? 'Security Overview' :
-                activeTab === 'forensics' ? 'Deep Discovery' :
-                  activeTab === 'ips' ? 'Prevention Control' :
-                    activeTab === 'alerts' ? 'Intelligence Logs' :
-                      activeTab === 'threat-map' ? 'Global Landscape' : 'Engine Configuration'}
+            <h1 className="text-5xl font-black tracking-tighter text-gradient leading-none">
+              {activeTab === 'dashboard' ? 'Sentinel Intelligence' :
+                activeTab === 'forensics' ? 'Topological Discovery' :
+                  activeTab === 'ips' ? 'Active Defense Protocol' :
+                    activeTab === 'alerts' ? 'Signal Intelligence' :
+                      activeTab === 'threat-map' ? 'Global Landscape' : 'System Configuration'}
             </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500, marginTop: '0.5rem' }}>
+            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mt-3 italic opacity-80">
               {activeTab === 'dashboard'
-                ? 'Advanced real-time intrusion monitoring and behavioral analysis'
+                ? 'Synthesizing real-time intrusion telemetry and behavioral heuristics'
                 : activeTab === 'forensics'
-                  ? 'Exhaustive network traffic investigation and relationship mapping'
+                  ? 'Executing exhaustive network traffic interrogation and logic mapping'
                   : activeTab === 'ips'
-                    ? 'Automated prevention protocols and active network blocking'
+                    ? 'Managing automated prevention matrices and terminal isolation'
                     : activeTab === 'alerts'
-                      ? 'Consolidated security incident records and detection matrix'
+                      ? 'Consolidated security incident archives and forensic signal matrix'
                       : activeTab === 'threat-map'
-                        ? 'Geospatial visualization of inbound and outbound vectors'
-                        : 'System-wide performance parameters and security rules'}
+                        ? 'Geospatial interrogation of active inbound and outbound vectors'
+                        : 'Neural engine parameters and global security protocol configuration'}
             </p>
           </div>
-          <div className="glass-card hover:border-accent-primary/40 transition-all duration-500" style={{ padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderRadius: '16px' }}>
+          <div className={`glass-card p-4 transition-all duration-700 cursor-pointer flex items-center gap-4 rounded-2xl border ${isLive ? 'border-emerald-500/50 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.1)]' : 'border-white/10 bg-white/5 hover:border-accent-primary/40'}`}
+            onClick={toggleLiveMode}>
             <div className="relative">
-              <div className="w-2.5 h-2.5 rounded-full bg-accent-success animate-pulse shadow-[0_0_10px_var(--accent-success)]"></div>
-              <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-accent-success animate-ping opacity-75"></div>
+              <div className={`w-3 h-3 rounded-full ${isLive ? 'bg-emerald-500 shadow-[0_0_12px_#10b981]' : 'bg-slate-600'} animate-pulse`}></div>
+              {isLive && <div className="absolute inset-0 w-3 h-3 rounded-full bg-emerald-500 animate-ping opacity-75"></div>}
             </div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'white' }}>System Shield Active</span>
+            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${isLive ? 'text-emerald-400' : 'text-white'}`}>
+              {isLive ? 'Sniffing active' : 'Passive Monitoring'}
+            </span>
           </div>
         </header>
 

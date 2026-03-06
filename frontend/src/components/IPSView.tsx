@@ -78,12 +78,12 @@ const IPSView: React.FC = () => {
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left border-separate border-spacing-y-2">
                         <thead>
-                            <tr className="text-[10px] font-black uppercase text-slate-500 tracking-widest">
-                                <th className="pb-2 px-4">Blocked Origin</th>
-                                <th className="pb-2 px-4">Attack Vector</th>
-                                <th className="pb-2 px-4">Intelligence Logic</th>
-                                <th className="pb-2 px-4">Timestamp</th>
-                                <th className="pb-2 px-4 text-right">Action</th>
+                            <tr className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] border-b border-white/5">
+                                <th className="pb-4 px-4 text-accent-danger/70">Target Vector</th>
+                                <th className="pb-4 px-4">Threat Signature</th>
+                                <th className="pb-4 px-4">Heuristic Analysis</th>
+                                <th className="pb-4 px-4 text-right">Neutralized At</th>
+                                <th className="pb-4 px-4 text-right">Countermeasure</th>
                             </tr>
                         </thead>
                         <tbody>

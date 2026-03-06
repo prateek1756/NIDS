@@ -10,22 +10,25 @@ interface StatsCardProps {
 
 const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon: Icon, trend, color = 'var(--accent-primary)' }) => {
     return (
-        <div className="glass-card fade-in-up hover:scale-[1.02] transition-all duration-300 group">
-            <div className="flex justify-between items-start mb-4" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+        <div className="glass-card fade-in-up hover:scale-[1.05] transition-all duration-500 group relative">
+            <div className="flex justify-between items-start mb-6">
                 <div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800 }}>{title}</p>
-                    <h3 style={{ fontSize: '2rem', marginTop: '0.25rem', fontWeight: 800, color: 'white' }}>{value}</h3>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] mb-1">{title}</p>
+                    <h3 className="text-3xl font-black text-white tracking-tighter text-gradient">{value}</h3>
                 </div>
-                <div style={{ padding: '0.75rem', borderRadius: '15px', background: `${color}15`, border: `1px solid ${color}30` }} className="group-hover:rotate-12 transition-transform duration-500">
+                <div
+                    className="p-4 rounded-2xl transition-all duration-500 group-hover:rotate-6 shadow-inner"
+                    style={{ background: `${color}15`, border: `1px solid ${color}30` }}
+                >
                     <Icon size={24} color={color} />
                 </div>
             </div>
             {trend && (
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', color: trend.startsWith('+') ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
-                    <span style={{ padding: '2px 6px', borderRadius: '4px', background: `${trend.startsWith('+') ? 'var(--accent-success)' : 'var(--accent-danger)'}20` }}>
+                <div className="flex items-center gap-3 mt-4">
+                    <span className={`px-2 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase ${trend.startsWith('+') ? 'bg-accent-success/10 text-accent-success border border-accent-success/20' : 'bg-accent-danger/10 text-accent-danger border border-accent-danger/20'}`}>
                         {trend}
                     </span>
-                    <span style={{ color: 'var(--text-dim)', fontWeight: 500 }}>from last hour</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest italic">Temporal Variance</span>
                 </div>
             )}
         </div>

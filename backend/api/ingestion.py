@@ -17,7 +17,7 @@ async def upload_package(file: UploadFile = File(...)):
         
         # 2. Run forensics
         forensics_engine.ingest_data(data)
-        analysis = forensics_engine.analyze()
+        analysis = await forensics_engine.analyze()
         
         return {
             "filename": file.filename,
@@ -32,4 +32,4 @@ async def get_current_graph():
     """
     Get the latest analyzed graph data.
     """
-    return forensics_engine.analyze()
+    return await forensics_engine.analyze()
